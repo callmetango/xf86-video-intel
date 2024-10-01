@@ -475,7 +475,7 @@ uxa_picture_for_pixman_format(ScreenPtr screen,
 		return 0;
 
 	if (!uxa_pixmap_is_offscreen(pixmap)) {
-		screen->DestroyPixmap(pixmap);
+		dixDestroyPixmap(pixmap, 0);
 		return 0;
 	}
 
@@ -484,7 +484,7 @@ uxa_picture_for_pixman_format(ScreenPtr screen,
 						   PIXMAN_FORMAT_DEPTH(format),
 						   format),
 				0, 0, serverClient, &error);
-	screen->DestroyPixmap(pixmap);
+	dixDestroyPixmap(pixmap, 0);
 	if (!picture)
 		return 0;
 
@@ -588,7 +588,7 @@ uxa_create_solid(ScreenPtr screen, uint32_t color)
 		return 0;
 
 	if (!uxa_prepare_access((DrawablePtr)pixmap, UXA_ACCESS_RW)) {
-		(*screen->DestroyPixmap)(pixmap);
+		dixDestroyPixmap(pixmap, 0);
 		return 0;
 	}
 	*((uint32_t *)pixmap->devPrivate.ptr) = color;
@@ -597,7 +597,7 @@ uxa_create_solid(ScreenPtr screen, uint32_t color)
 	picture = CreatePicture(0, &pixmap->drawable,
 				PictureMatchFormat(screen, 32, PICT_a8r8g8b8),
 				CPRepeat, &repeat, serverClient, &error);
-	(*screen->DestroyPixmap)(pixmap);
+	dixDestroyPixmap(pixmap, 0);
 
 	return picture;
 }
@@ -824,13 +824,13 @@ uxa_acquire_drawable(ScreenPtr pScreen,
 
 	/* Skip the copy if the result remains in memory and not a bo */
 	if (!uxa_pixmap_is_offscreen(pPixmap)) {
-		pScreen->DestroyPixmap(pPixmap);
+		dixDestroyPixmap(pPixmap, 0);
 		return 0;
 	}
 
 	pGC = GetScratchGC(depth, pScreen);
 	if (!pGC) {
-		pScreen->DestroyPixmap(pPixmap);
+		dixDestroyPixmap(pPixmap, 0);
 		return 0;
 	}
 
@@ -842,7 +842,7 @@ uxa_acquire_drawable(ScreenPtr pScreen,
 	pDst = CreatePicture(0, &pPixmap->drawable,
 			     PictureMatchFormat(pScreen, depth, pSrc->format),
 			     0, 0, serverClient, &error);
-	pScreen->DestroyPixmap(pPixmap);
+	dixDestroyPixmap(pPixmap, 0);
 	if (!pDst)
 		return 0;
 
@@ -974,7 +974,7 @@ uxa_try_driver_composite(CARD8 op,
 
 		gc = GetScratchGC(depth, screen);
 		if (!gc) {
-			screen->DestroyPixmap(pixmap);
+			dixDestroyPixmap(pixmap, 0);
 			return 0;
 		}
 
@@ -989,7 +989,7 @@ uxa_try_driver_composite(CARD8 op,
 		localDst = CreatePicture(0, &pixmap->drawable,
 					 PictureMatchFormat(screen, depth, pDst->format),
 					 0, 0, serverClient, &error);
-		screen->DestroyPixmap(pixmap);
+		dixDestroyPixmap(pixmap, 0);
 
 		if (!localDst)
 			return 0;
@@ -1234,7 +1234,7 @@ uxa_try_magic_two_pass_composite_helper(CARD8 op,
 
 		gc = GetScratchGC(depth, screen);
 		if (!gc) {
-			screen->DestroyPixmap(pixmap);
+			dixDestroyPixmap(pixmap, 0);
 			return 0;
 		}
 
@@ -1249,7 +1249,7 @@ uxa_try_magic_two_pass_composite_helper(CARD8 op,
 		localDst = CreatePicture(0, &pixmap->drawable,
 					 PictureMatchFormat(screen, depth, pDst->format),
 					 0, 0, serverClient, &error);
-		screen->DestroyPixmap(pixmap);
+		dixDestroyPixmap(pixmap, 0);
 
 		if (!localDst)
 			return 0;
@@ -1566,7 +1566,7 @@ uxa_create_alpha_picture(ScreenPtr pScreen,
 		return 0;
 	pPicture = CreatePicture(0, &pPixmap->drawable, pPictFormat,
 				 0, 0, serverClient, &error);
-	(*pScreen->DestroyPixmap) (pPixmap);
+	dixDestroyPixmap(pPixmap, 0);
 	return pPicture;
 }
 

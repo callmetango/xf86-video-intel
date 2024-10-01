@@ -807,7 +807,7 @@ static Bool intel_uxa_put_image(PixmapPtr pixmap,
 				return FALSE;
 
 			if (!intel_uxa_pixmap_is_offscreen(scratch)) {
-				screen->DestroyPixmap(scratch);
+				dixDestroyPixmap(scratch, 0);
 				return FALSE;
 			}
 
@@ -826,7 +826,7 @@ static Bool intel_uxa_put_image(PixmapPtr pixmap,
 					ret = FALSE;
 			}
 
-			(*screen->DestroyPixmap)(scratch);
+			dixDestroyPixmap(scratch, 0);
 			return ret;
 		}
 	}
@@ -892,13 +892,13 @@ static Bool intel_uxa_get_image(PixmapPtr pixmap,
 			return FALSE;
 
 		if (!intel_uxa_pixmap_is_offscreen(scratch)) {
-			screen->DestroyPixmap(scratch);
+			dixDestroyPixmap(scratch, 0);
 			return FALSE;
 		}
 
 		gc = GetScratchGC(pixmap->drawable.depth, screen);
 		if (!gc) {
-			screen->DestroyPixmap(scratch);
+			dixDestroyPixmap(scratch, 0);
 			return FALSE;
 		}
 
@@ -919,7 +919,7 @@ static Bool intel_uxa_get_image(PixmapPtr pixmap,
 	ret = intel_uxa_pixmap_get_image(pixmap, x, y, w, h, dst, dst_pitch);
 
 	if (scratch)
-		scratch->drawable.pScreen->DestroyPixmap(scratch);
+		dixDestroyPixmap(scratch, 0);
 
 	return ret;
 }
